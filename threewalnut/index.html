@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-btn {
+				padding: 5px;
+			}
+			
+			.pd40 {
+				padding-top: 40px;
+			}
+			
+			.md20 {
+				margin-top: 20px;
+			}
+			
+			.copy {
+				width: 100%;
+				height: 30px;
+				position: fixed;
+				top: 80%;
+				left: 0;
+				text-align: center;
+				display: none;
+			}
+			
+			.title {
+				background-color: #0FC5E9;
+				color: #fff;
+			}
+			
+			.title h1 {
+				color: #fff;
+			}
+		</style>
+	</head>
+	<script type="text/html" id="login">
+		<header class="mui-bar mui-bar-nav title">
+			<h1 class="mui-center mui-title">登陆</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded pd40">
+				<div class="mui-input-group">
+					<div class="mui-input-row">
+						<label for="phone">手机号</label>
+						<input type="tel" id="phone" maxlength="11" class="mui-input-clear mui-input" placeholder="请输入手机号码" />
+					</div>
+				</div>
+				<div class="mui-input-group md20">
+					<div class="mui-input-row">
+						<label for="pwd">密码</label>
+						<input type="password" id="pwd" maxlength="16" class="mui-input-clear mui-input" placeholder="请输入密码" />
+					</div>
+				</div>
+			</div>
+			<div class="mui-content-padded pd40">
+				<button id='login_btn' class="mui-btn mui-btn-block title">登录</button>
+			</div>
+			<div class="copy">
+				<p>v1.0&copy;</p>
+			</div>
+		</div>
+	</script> 
+	<script type="text/html" id="updExist">
+		<header class="mui-bar mui-bar-nav title">
+			<h1 class="mui-center mui-title">应用更新</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded pd40">
+				<p style="text-align: center;">正在为您更新最新客户端...</p>
+			</div>
+		</div>
+	</script>
+	<body id="index">
+		
+	</body>
+	<script src="js/md5.min.js"></script>
+	<script src="js/mui.min.js"></script>
+	<script src="js/util.js"></script>
+	<script type="text/javascript">
+		mui.plusReady(function() {
+			/*应用更新*/
+			util.plusReady(function(exist){
+				if(exist){
+					document.getElementById("index").innerHTML=document.getElementById("updExist").text;
+				}else{
+					document.getElementById("index").innerHTML=document.getElementById("login").text;
+					plus.screen.lockOrientation("portrait-primary");
+					var phoneDom = document.getElementById('phone');
+					var pwdDom = document.getElementById('pwd');
+					document.getElementById('login_btn').addEventListener('tap', function() {
+						var phone = phoneDom.value;
+						var pwd = pwdDom.value;
+						if (!util.verifyPhone(phone)) {
+							mui.toast('请输入有效手机号码');
+							return false;
+						}
+						if (pwd.length < 8) {
+							mui.toast('密码长度错误');
+							return false;
+						}
+						
+						var params = {
+							phone:phone,
+							pwd:md5(pwd)
+						};
+						util.getAccessToken(params);
+					});
+				}
+			});
+		});
+	</script>
+
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			.scanLabel {
+				background-color: #555555;
+				width: 100%;
+				height: 350px;
+			}
+			
+			.title {
+				background-color: #0FC5E9;
+				color: #fff;
+			}
+			
+			.title h1 {
+				color: #fff;
+			}
+			
+			.title a {
+				color: #fff;
+			}
+			
+			.uploadImg {
+				padding-top: 20px;
+				display: none;
+			}
+			
+			.uploadImg button {
+				margin-bottom: 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<header class="mui-bar mui-bar-nav title">
+			<a id='back' class="mui-icon mui-icon-back mui-pull-left"></a>
+			<!--<a id="set" class="mui-icon mui-icon-gear-filled mui-pull-right"></a>-->
+			<h1 class="mui-title">二维码扫描</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div id="barcode" class="scanLabel"></div>
+				<div class="mui-button-row" style="display: none;">
+					<button id="select" class="mui-btn mui-btn-warning">选择照片</button>
+				</div>
+				<div id="file" class="uploadImg">
+					<div class="mui-button-row">
+						<button id="selectfiles" class='mui-btn'>选择图片<span class="mui-badge" id="infoImg">0 kb</span></button>
+					</div>
+
+					<div class="mui-button-row">
+						<button id="postfiles" class='mui-btn mui-btn-blue'>开始上传</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="js/util.js"></script>
+	<script src="js/plupload.full.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		mui.plusReady(function() {
+			document.getElementById('back').addEventListener('tap', function() {
+				//获取当前窗口，返回的时候注销，否则无法再次扫码
+				var webid = plus.webview.getWebviewById('scan');
+				plus.webview.close(webid);
+				mui.openWindow({
+					url: 'main.html',
+					id: 'main',
+					show: {
+						aniShow: 'zoom-fade-out',
+						duration: 300
+					}
+				});
+			});
+			var scan = new plus.barcode.Barcode("barcode", plus.barcode.QR);
+			scan.onmarked = function(type, results, file) {
+				if (results) {
+					var result = JSON.parse(results);
+					var params = {};
+					if (result.class_name == 'call_owner') {
+						//给业主拨打电话
+						params.house_uid = result.object_uid;
+						callOwner(params);
+						mui.toast('获取业主电话');
+					} else if (result.class_name == 'call_customer') {
+						//给客户打电话
+						params.customer_uid = result.object_uid;
+						callCustomer(params);
+						mui.toast('获取客户电话');
+					} else if (result.class_name == 'add_owner_pic') {
+						//上传房源图片
+						params.obj_uid = result.object_uid;
+						params.class_name = 'house_listing';
+						getossToken(params);
+						mui.toast('扫码成功，请选择上传房源图片');
+					} else if (result.class_name == 'add_watch_pic') {
+						//上传带看图片
+						params.obj_uid = result.object_uid;
+						params.class_name = 'house_watch';
+						mui.toast('扫码成功，请选择上传带看图片');
+						getossToken(params);
+					} else {
+						mui.toast('参数错误');
+					}
+				} else {
+					mui.toast('参数错误');
+				}
+			};
+			scan.onerror = function(error) {
+				mui.toast('无法识别二维码');
+			};
+			scan.start();
+			document.getElementById('select').addEventListener('tap', function() {
+				getossToken(params);
+			});
+			//给业主打电话
+			function callOwner(params) {
+				if (params.house_uid) {
+					util.ajax({
+						url: '/phone/houseowner',
+						data: params,
+						success: function(data) {
+							var phoneArr = data.phones;
+							util.getPhoneNumber(phoneArr);
+						}
+					});
+				}
+			}
+			//给客户打电话
+			function callCustomer(params) {
+				if (params.customer_uid) {
+					util.ajax({
+						url: '/phone/customer',
+						data: {
+							customer_uid: params.customer_uid
+						},
+						success: function(data) {
+							var phoneArr = data.phones;
+							util.getPhoneNumber(phoneArr);
+						}
+					});
+				}
+			}
+			//上传图片
+			function getossToken(params) {
+				document.getElementById('file').style.display = 'block';
+				upImg(params);
+			}
+			//新版上传图片
+			function upImg(params) {
+				var upload = new plupload.Uploader({
+					runtimes: 'html5',
+					browse_button: 'selectfiles',
+					url: util.host,
+					init: {
+						PostInit: function() {
+							document.getElementById('postfiles').addEventListener('click', function() {
+								set_upload_param(upload,params);
+								return false;
+							});
+						},
+						FilesAdded: function(up, files) {
+							plupload.each(files, function(file) {
+								document.getElementById('infoImg').innerHTML = plupload.formatSize(file.size);
+							});
+						},
+						BeforeUpload: function(up, file) {
+							set_upload_param(up,params);
+						},
+						UploadProgress: function(up, file) {
+							plus.nativeUI.showWaiting(file.percent + '%');
+							if (file.percent == 100) {
+								plus.nativeUI.closeWaiting();
+							}
+						},
+						FileUploaded: function(up, file, info) {
+							if (info.status >= 200 || info.status < 200) {
+								util.ajax({
+									url: '/merchant/picture/add',
+									data: {
+										class_name: params.class_name,
+										obj_uid: params.obj_uid,
+										file_name: eval('(' + info.response + ')').file_name
+									},
+									success: function(data) {
+										mui.alert('上传成功', '上传状态', '关闭', function() {
+											//关闭扫码
+											var webid = plus.webview.getWebviewById('scan');
+											plus.webview.close(webid);
+										});
+									},
+									error: function(err) {
+										mui.toast(err.msg);
+									}
+								});
+							} else {
+								mui.toast(info.response);
+							}
+						},
+						Error: function(up, err) {
+							mui.toast('网络错误');
+						}
+					}
+				});
+				upload.init();
+			}
+			
+			function set_upload_param(up,data){
+				new_multipart_params={
+					'class_name':data.class_name,
+					'obj_uid': data.obj_uid
+				},
+				up.setOption({
+					'headers':{
+						'x-access-token':util.token
+					},
+					'url':util.host+'/merchant/picture/upload',
+					'multipart_params':new_multipart_params
+				});
+				up.start();
+			}
+		});
+	</script>
+
+</html>

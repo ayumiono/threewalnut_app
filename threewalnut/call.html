@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+		<style type="text/css">
+			.list-time {
+				line-height: 1.6;
+				padding-top: 10px;
+			}
+			
+			.icon-zhuangtai {
+				color: #CF2D28;
+				display: inline-block;
+				margin-right: 5px;
+				font-size: 12px;
+				margin-top: -3px;
+			}
+			
+			.signType {
+				position: absolute;
+				top: 25px;
+				left: 80%;
+				background-color: #FFC023;
+				color: #fff;
+				border: 0;
+			}
+			
+			.mui-backdrop {
+				display: none;
+			}
+			
+			.alertBg {
+				position: fixed;
+				width: 100%;
+				height: 100%;
+				left: 0;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				z-index: 999;
+			}
+			
+			.showAlert {
+				width: 260px;
+				height: 260px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				z-index: 1000;
+				background-color: #fff;
+				margin: -130px 0 0 -130px;
+				border-radius: 8px;
+			}
+			
+			.showAlert h4 {
+				text-align: center;
+				padding: 10px 0;
+				font-weight: 100;
+			}
+			
+			.showAlert .select {
+				border: 1px solid #ddd;
+				display: inline-block;
+				width: 160px;
+				height: 42px;
+				margin-bottom: 10px;
+			}
+			
+			.select select {
+				padding-left: 5px;
+			}
+			
+			.select input {
+				border: 0;
+			}
+			
+			.mui-input-row i {
+				position: absolute;
+				top: 10px;
+				left: 220px;
+			}
+			
+			.submit {
+				width: 100%;
+				text-align: center;
+			}
+			
+			.submit button {
+				width: 120px;
+				border: 0;
+				color: #fff;
+				background-color: #0FC5E9;
+			}
+			
+			.customerType {
+				margin-right: 10px;
+			}
+			
+			.mui-table-view-cell {
+				background-color: #F4F4F6;
+			}
+			.noData{
+				padding-top: 40px;
+				display: none;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<ul class="mui-table-view" id="listData">
+
+				</ul>
+			</div>
+		</div>
+		<div class="mui-button-row noData">
+			<p>没有数据，下拉重新获取</p>
+		</div>
+		<div class="mui-backdrop">
+			<div class="alertBg"></div>
+			<div class="showAlert">
+				<h4>标记</h4>
+				<div class="mui-input-row">
+					<label>身份：</label>
+					<div class="select">
+						<select id="callType">
+							<option value="客户">客户</option>
+							<option value="业主">业主</option>
+							<option value="无效">无效</option>
+						</select>
+					</div>
+					<i class="mui-icon mui-icon-arrowdown"></i>
+				</div>
+				<div class="mui-input-row">
+					<label>称呼：</label>
+					<span class="select">
+						<input type="text" id="callName"/>
+					</span>
+				</div>
+				<div class="mui-input-row">
+					<label>备注：</label>
+					<span class="select">
+						<input type="text" id="callComment"/>
+					</span>
+				</div>
+				<div class="submit">
+					<button>提交</button>
+				</div>
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/template.js"></script>
+		<script src="js/zepto.core.min.js"></script>
+		<script type="text/html" id="data-item">
+			{{if callDatas}} 
+			{{each callDatas as value index}}
+			<li class="mui-table-view-cell">
+				<div class="list-title">
+					<span class="mui-icon iconfont {{if value.sign}}icon-zhuangtai{{/if}}"></span>
+					<span class="customerType">{{if value.sign == 1}}业主：{{value.name}}{{else if value.sign == 2}}客户：{{value.name}}{{else}}客户号码：{{/if}}</span>
+					<span>{{value.call_dm}}</span>
+				</div>
+				<div class="list-time">
+					<p>通话时间: {{value.follow_time}}</p>
+				</div>
+				<button class="signType" data-id="{{value.uid}}" {{if value.sign}}disabled="disabled" {{/if}}>标记</button>
+			</li>
+			{{/each}} 
+			{{/if}}
+		</script>
+		<script type="text/javascript">
+			mui.plusReady(function() {
+				var count = Math.ceil(window.innerHeight / 97);
+				var pageCount = null;
+				var stopLoad = false;
+				var params = {
+					type: 0,
+					page_index: 0, //页码
+					page_size: count //数量
+				};
+				var id = null,
+					callType = '客户',
+					curDom = null,
+					typeNum = 1;
+				mui.init({
+					swipeBack: false,
+					pullRefresh: {
+						container: '#pullrefresh',
+						up: {
+							contentrefresh: '正在加载...',
+							contentnomore: '没有更多数据了',
+							callback: pullupRefresh
+						},
+						down:{
+							contentrefresh: '刷新数据...',
+							contentnomore: '没有更多数据了',
+							callback: pullDownRefresh
+						}
+					}
+				}, pullupRefresh());
+				mui('#pullrefresh').on('tap', '.signType', function() {
+					$('.mui-backdrop').show();
+					id = $(this).attr('data-id');
+					curDom = $(this);
+				});
+				mui('body').on('tap', '.alertBg', function() {
+					$('.mui-backdrop').hide();
+				});
+				mui('body').on('tap', '.submit', function() {
+					var callName = $('#callName').val();
+					var callComment = $('#callComment').val();
+					if (id && typeNum) {
+						var params = {
+							stranger_uid: id,
+							type: typeNum,
+							name: callName,
+							comment: callComment || ''
+							};
+						util.ajax({
+							url: '/merchant/stranger/mark',
+							data: params,
+							success: function(data) {
+								curDom.parent().find('.iconfont').addClass('icon-zhuangtai');
+								curDom.parent().find('.customerType').text(callType + '：' + callName);
+								curDom.attr('disabled', 'disabled');
+								$('.mui-backdrop').hide();
+								mui.toast(data.msg);
+							}
+						})
+					} else {
+						mui.toast('填写信息');
+					}
+				});
+				mui('body').on('change', '#callType', function() {
+					callType = this.value;
+					if (this.value == '客户') {
+						typeNum = 1;
+					}
+					if (this.value == '业主') {
+						typeNum = 2;
+					}
+					if (this.value == '无效') {
+						typeNum = 3;
+					}
+				});
+				//上拉刷新
+				function pullupRefresh() {
+					params.page_index++;
+					if (params.page_index > pageCount) {
+						stopLoad = true;
+					}
+					mui('#pullrefresh').pullRefresh().endPullupToRefresh(stopLoad); //参数为true代表没有更多数据了。
+					getCallList();
+				}
+
+				//下拉重置，获取最新数据
+				function pullDownRefresh(){
+					params.page_index = 1;
+					$('.noData').hide();
+					$('#listData').children().remove();
+					mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+					mui('#pullrefresh').pullRefresh().refresh(true); //重置刷新
+					getCallList();
+				}
+
+				function getCallList() {
+					if (params) {
+						util.ajax({
+							url: '/merchant/stranger/list',
+							data: params,
+							success: function(data) {
+								mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+								var callList = data.result[0],
+									pageData = data.result[1];
+								pageCount = pageData[0].page_count;
+								if (callList.length) {
+									$('.noData').hide();
+									$('#listData').append(template('data-item', {
+										callDatas: callList
+									}));
+								} else {
+									mui.toast('没有通话列表数据');
+									if(params.page_index == 1){
+										$('.noData').show();
+									}
+								}
+							}
+						});
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>

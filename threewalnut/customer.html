@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/mui.picker.all.css" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+		<style type="text/css">
+			.fixed {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 50px;
+				overflow: hidden;
+				z-index: 2;
+				background-color: #F4F4F6;
+			}
+			
+			.input input {
+				float: left;
+				width: 65%;
+			}
+			
+			.input button {
+				width: 30%;
+				float: right;
+				padding: 10px 0;
+			}
+			
+			.select {
+				width: 100%;
+				height: 40px;
+				line-height: 40px;
+				border-top: 1px solid #ddd;
+				border-bottom: 1px solid #ddd;
+				box-sizing: border-box;
+			}
+			
+			.select button {
+				width: 33.3%;
+				float: left;
+				border: 0;
+				background-color: #F4F4F6;
+				height: 38px;
+			}
+			
+			.select .margin {
+				border-right: 1px solid #ddd;
+			}
+			
+			.pullrefresh {
+				width: 100%;
+				padding-top: 50px;
+				background-color: #F4F4F6;
+			}
+			
+			.paty1 {
+				width: 42%;
+				float: left;
+				padding-right: 8px;
+			}
+			
+			.part2 {
+				width: 40%;
+				float: left;
+			}
+			
+			.paty1 p {
+				color: #000;
+			}
+			
+			.part2 p {
+				color: #000;
+			}
+			
+			.phone-call {
+				position: absolute;
+				top: 30px;
+				left: 70%;
+				border: 0;
+				background-color: #FFC023;
+				color: #fff;
+				z-index: 3;
+			}
+			
+			.phone-call span {
+				margin-right: 5px;
+			}
+			
+			.submit {
+				background-color: #0FC5E9;
+				color: #fff;
+				border: 0;
+			}
+			
+			.bg input {
+				background-color: #F4F4F6;
+			}
+			
+			.mui-table-view {
+				background-color: #F4F4F6;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="fixed">
+			<div class="mui-content-padded">
+				<div class="mui-input-row input bg">
+					<input type="text" id="customerName" placeholder="请输入客户名" />
+					<button class="submit" id="exec">查询</button>
+				</div>
+			</div>
+		</div>
+		<div class="pullrefresh">
+			<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+				<div class="mui-scroll">
+					<ul class="mui-table-view" id="list"></ul>
+				</div>
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/zepto.core.min.js"></script>
+		<script src="js/template.js"></script>
+		<script type="text/html" id="customerList">
+			{{if customerDatas}} {{each customerDatas as value index}}
+			<li class="mui-table-view-cell">
+				<div class="tapLink" data-id="{{value.uid}}">
+					<div class="paty1">
+						<p>客户：{{value.customer_name}}</p>
+						<p>客源类型：{{value.type}}</p>
+						<p>是否包租：{{if  value.rent_type == 1}}普通{{else if value.rent_type == 2}}包租{{/if}}</p>
+					</div>
+					<div class="part2">
+						<p>交易类型：{{if value.listing_type == 1}}租{{else if value.listing_type == 2}}售{{/if}}</p>
+						<p>用途：{{value.usage}}</p>
+					</div>
+				</div>
+				<button class="phone-call" data-id="{{value.uid}}"><span class="mui-icon iconfont icon-phone"></span>联系客户</button>
+			</li>
+			{{/each}} {{/if}}
+		</script>
+		<script type="text/javascript">
+			(function(mui) {
+				mui.ready(function() {
+					var pageCount = null;
+					var stopLoad = false;
+					var params = {
+						page_index: 1, //页码
+						page_size: 6 //数量
+					};
+					mui.init({
+						swipeBack: false,
+						pullRefresh: {
+							container: '#pullrefresh',
+							up: {
+								contentrefresh: '正在加载...',
+								contentnomore: '没有更多数据了',
+								callback: pullupRefresh
+							}
+						}
+					});
+
+					document.getElementById('exec').addEventListener('tap', function(event) {
+						$('#list').children().remove();
+						params.name = '';
+						pageCount = null;
+						params.page_index = 1;
+						stopLoad = false;
+						var name = document.getElementById('customerName').value;
+						mui('#pullrefresh').pullRefresh().enablePullupToRefresh();
+						mui('#pullrefresh').pullRefresh().refresh(true); //重置上拉刷新
+						if (name) {
+							params.name = name;
+						}
+						execCustomer();
+					});
+					mui('#list').on('tap', '.tapLink', function() {
+						var uid = this.getAttribute('data-id') || '';
+						if (uid) {
+							util.ajax({
+								url: '/merchant/customer/get',
+								data: {customer_uid:uid},
+								success: function(data) {
+									mui.openWindow({
+										url: 'customerDetail.html',
+										id: 'customerDetail',
+										extras: {
+											customerDetail: data
+										},
+										show: {
+											aniShow: 'slide-in-right',
+											duration: 300
+										}
+									});
+								}
+							});
+						}
+					});
+					mui('#list').on('tap', '.phone-call', function() {
+						var uid = this.getAttribute('data-id') || '';
+						if(uid){
+							util.ajax({
+								url:'/phone/customer',
+								data:{customer_uid:uid},
+								success:function(data){
+									var phoneArr = data.phones;
+									util.getPhoneNumber(phoneArr);
+								},
+								error:function(err){
+									mui.toast('获取号码失败');
+								}
+							});
+						}
+					});
+
+					function pullupRefresh() {
+						params.page_index++;
+						if (params.page_index > pageCount) {
+							stopLoad = true;
+						}
+						setTimeout(function() {
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(stopLoad); //参数为true代表没有更多数据了。
+							execCustomer();
+						}, 1000);
+					}
+
+					function execCustomer() {
+						if (params.name) {
+							util.ajax({
+								url: '/merchant/customer/list',
+								data: params,
+								success: function(data) {
+									var customerList = data.result[0],
+										pageData = data.result[1],
+										pageCount = pageData[0].page_count;
+									if (customerList.length) {
+										$('#list').append(template('customerList', {
+											customerDatas: customerList
+										}));
+									} else {
+										mui.toast('没有查询结果');
+										mui('#pullrefresh').pullRefresh().disablePullupToRefresh();
+									}
+								}
+							});
+						} else {
+							mui.toast('至少输入一个查询条件');
+							mui('#pullrefresh').pullRefresh().disablePullupToRefresh();
+						}
+					}
+				});
+			})(mui);
+		</script>
+	</body>
+
+</html>

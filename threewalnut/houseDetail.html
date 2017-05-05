@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+		<style>
+			.scan {
+				font-size: 12px;
+				padding-top: 12px;
+			}
+			
+			.title {
+				background-color: #0FC5E9;
+				color: #fff;
+			}
+			
+			.title h1 {
+				color: #fff;
+			}
+			
+			.title a {
+				color: #fff;
+			}
+			
+			.detail {
+				margin-bottom: 20px;
+			}
+			
+			.detail p {
+				color: #000;
+			}
+			
+			.detail p i {
+				margin-right: 10px;
+			}
+			
+			.detail p span {
+				width: 25%;
+				display: inline-block;
+			}
+			
+			.detail p img {
+				height: 160px;
+				display: block;
+				background-color: #0FC5E9;
+			}
+			
+			.tags {
+				width: 100%;
+			}
+			
+			.tags ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				padding-left: 15px;
+				float: left;
+				margin-bottom: 10px;
+			}
+			
+			.tags ul li {
+				float: left;
+				padding: 2px;
+				font-size: 14px;
+				margin-right: 8px;
+			}
+			
+			.tags ul li i {
+				color: #0FC5E9;
+				margin-right: 5px;
+			}
+			
+			.mui-preview-image.mui-fullscreen {
+				position: fixed;
+				z-index: 20;
+				background-color: #000;
+			}
+			
+			.mui-preview-header,
+			.mui-preview-footer {
+				position: absolute;
+				width: 100%;
+				left: 0;
+				z-index: 10;
+			}
+			
+			.mui-preview-header {
+				height: 44px;
+				top: 0;
+			}
+			
+			.mui-preview-footer {
+				height: 50px;
+				bottom: 0px;
+			}
+			
+			.mui-preview-header .mui-preview-indicator {
+				display: block;
+				line-height: 25px;
+				color: #fff;
+				text-align: center;
+				margin: 15px auto 4;
+				width: 70px;
+				background-color: rgba(0, 0, 0, 0.4);
+				border-radius: 12px;
+				font-size: 16px;
+			}
+			
+			.mui-preview-image {
+				display: none;
+				-webkit-animation-duration: 0.5s;
+				animation-duration: 0.5s;
+				-webkit-animation-fill-mode: both;
+				animation-fill-mode: both;
+			}
+			
+			.mui-preview-image.mui-preview-in {
+				-webkit-animation-name: fadeIn;
+				animation-name: fadeIn;
+			}
+			
+			.mui-preview-image.mui-preview-out {
+				background: none;
+				-webkit-animation-name: fadeOut;
+				animation-name: fadeOut;
+			}
+			
+			.mui-preview-image.mui-preview-out .mui-preview-header,
+			.mui-preview-image.mui-preview-out .mui-preview-footer {
+				display: none;
+			}
+			
+			.mui-zoom-scroller {
+				position: absolute;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-box-align: center;
+				-webkit-align-items: center;
+				align-items: center;
+				-webkit-box-pack: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				-webkit-backface-visibility: hidden;
+			}
+			
+			.mui-zoom {
+				-webkit-transform-style: preserve-3d;
+				transform-style: preserve-3d;
+			}
+			
+			.mui-slider .mui-slider-group .mui-slider-item img {
+				width: auto;
+				height: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+			
+			.mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+				width: 100%;
+			}
+			
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+				display: inline-table;
+			}
+			
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+				display: table-cell;
+				vertical-align: middle;
+			}
+			
+			.mui-preview-loading {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+			
+			.mui-preview-loading.mui-active {
+				display: block;
+			}
+			
+			.mui-preview-loading .mui-spinner-white {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -25px;
+				margin-top: -25px;
+				height: 50px;
+				width: 50px;
+			}
+			
+			.mui-preview-image img.mui-transitioning {
+				-webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+				transition: transform 0.5s ease, opacity 0.5s ease;
+			}
+			
+			@-webkit-keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			
+			@keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			
+			@-webkit-keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+			
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+			
+			p img {
+				max-width: 100%;
+				height: auto;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav title">
+			<!--<a id='scan' href="javascript:;" class="mui-pull-right scan"><i class="iconfont icon-icon_scan"></i> 扫一扫</a>-->
+			<a id='back' class="mui-pull-left mui-icon mui-icon-arrowleft"></a>
+			<h1 class="mui-center mui-title">房源</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded detail" id="houseDetail">
+
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/template.js"></script>
+		<script src="js/mui.previewimage.js"></script>
+		<script src="js/mui.zoom.js"></script>
+		<script type="text/html" id="dataList">
+			<p><i class="mui-icon iconfont icon-file1"></i><span>交易类型：</span>{{if house.listing_type == 1}}租{{else if house.listing_type ==2}}售{{/if}}</p>
+			<p><i class="mui-icon iconfont icon-yaochifang"></i><span>是否包租：</span>{{if house.rent_type == 1}}普通{{else if house.rent_type == 2}}包租{{/if}}</p>
+			<p><i class="mui-icon iconfont icon-fenxi"></i><span>所属部门：</span>{{house.dept_name}}</p>
+			<p><i class="mui-icon iconfont icon-18"></i><span>业主：</span>{{house.owner_name}}</p>
+			<p><i class="mui-icon iconfont icon-tag"></i><span>房源编号：</span>{{house.house_no}}</p>
+			<p><i class="mui-icon iconfont icon-house"></i><span>楼盘：</span>{{house.community_name}}</p>
+			<p><i class="mui-icon iconfont icon-database"></i><span>栋座：</span>{{house.building_name}}</p>
+			<p><i class="mui-icon iconfont icon-home"></i><span>单元：</span>{{house.unit}}</p>
+			<p><i class="mui-icon iconfont icon-1323shouyeloucengqukuai"></i><span>楼层：</span>{{house.floor}}</p>
+			<p><i class="mui-icon iconfont icon-yaochifang"></i><span>房号：</span>22</p>
+			<p><i class="mui-icon iconfont icon-fenxi"></i><span>房型：</span>{{house.room}}</p>
+			<p><i class="mui-icon iconfont icon-celiang1"></i><span>面积：</span>{{house.acreage}}m<sup>2</sup></p>
+			<p><i class="mui-icon iconfont icon-leixing"></i><span>住宅类型：</span>哈哈</p>
+			<p><i class="mui-icon iconfont icon-icon12"></i><span>用途：</span>{{house.usage}}</p>
+			<p><i class="mui-icon iconfont icon-icotag"></i><span>状态：</span>{{house.status}}</p>
+			<p><i class="mui-icon iconfont icon-18window"></i><span>现状：</span>{{house.reside}}</p>
+			<p><i class="mui-icon iconfont icon-link"></i><span>来源：</span>{{house.source}}</p>
+			<p><i class="mui-icon iconfont icon-date1"></i><span>委托日期：</span>{{house.entrusted_date}}</p>
+			<p><i class="mui-icon iconfont icon-date"></i><span>交房日期：</span>{{house.delive_date}}</p>
+			<p><i class="mui-icon iconfont icon-datezhuanhuan"></i><span>可入住时间：</span>{{house.launch_time}}</p>
+			{{if house.tags}}
+			<div class="tags">
+				<ul>
+					{{each house.tags.split(',') as value index}}
+					<li><i class="mui-icon iconfont icon-check"></i>{{value}}</li>
+					{{/each}}
+				</ul>
+			</div>
+			{{/if}}
+			<div class="mui-clearfix"></div>
+			<p><i class="mui-icon iconfont icon-wenjianjia03"></i><span>产权证号：</span></p>
+			<p><i class="mui-icon iconfont icon-time"></i><span>最后跟进：</span></p>
+			<p><i class="mui-icon iconfont icon-18"></i><span>最后跟进人：</span></p>
+			<p><i class="mui-icon iconfont icon-time"></i><span>最后带看：</span></p>
+			<p><i class="mui-icon iconfont icon-pin"></i><span>备注：</span>{{house.comment}}</p>
+			{{if imgarr}}
+			<p><i class="mui-icon iconfont icon-18window"></i>图片预览:</p>
+			<p>
+				{{each imgarr as img index}}
+				<img src="{{img.img_url}}" data-preview-src="" data-preview-group="1" /> {{/each}}
+			</p>
+			{{/if}}
+		</script>
+		<script>
+			mui.plusReady(function() {
+				mui.previewImage();
+				var data = mui.currentWebview.buildDetail;
+				document.getElementById('houseDetail').innerHTML = template('dataList', {
+					house: data.result[0][0],
+					imgarr: data.result[1]
+				});
+				document.getElementById('back').addEventListener('tap', function() {
+				//获取当前窗口，返回的时候注销，否则数据不更新
+				var webid = plus.webview.getWebviewById('houseDetail');
+				plus.webview.close(webid);
+					mui.openWindow({
+						url: 'main.html',
+						id: 'main',
+						show: {
+							aniShow: 'zoom-fade-out',
+							duration: 300
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,135 @@
+{
+  "index.html": {
+    "resources": [
+      "js/md5.min.js",
+      "js/util.js",
+      "js/mui.min.js",
+      "js/zepto.min.js",
+      "css/mui.min.css",
+      "fonts/mui.ttf"
+    ],
+    "refer": [
+      "main.html"
+    ]
+  },
+  "main.html": {
+    "resources": [
+      "call.html",
+      "css/iconfont.css",
+      "fonts/iconfont.ttf",
+      "js/mui.min.js",
+      "fonts/mui.ttf",
+      "css/mui.min.css",
+      "js/util.js"
+    ],
+    "refer": [
+      "customer.html",
+      "report.html",
+      "house.html",
+      "call.html",
+      "scan.html",
+      "camera.html"
+    ]
+  },
+  "house.html": {
+    "resources": [
+      "css/mui.picker.all.css",
+      "js/mui.picker.all.js",
+      "js/util.js",
+      "js/mui.min.js",
+      "fonts/mui.ttf",
+      "css/iconfont.css",
+      "css/mui.min.css",
+      "fonts/iconfont.ttf",
+      "js/zepto.min.js",
+      "js/template.js"
+    ],
+    "refer": [
+      "index.html",
+      "houseDetail.html"
+    ]
+  },
+  "call.html": {
+    "resources": [
+      "js/template.js",
+      "js/mui.min.js",
+      "js/zepto.min.js",
+      "css/iconfont.css",
+      "css/mui.min.css",
+      "fonts/iconfont.ttf",
+      "js/util.js"
+    ]
+  },
+  "customer.html": {
+    "resources": [
+      "js/mui.min.js",
+      "fonts/mui.ttf",
+      "css/iconfont.css",
+      "css/mui.picker.all.css",
+      "css/mui.min.css",
+      "fonts/iconfont.ttf",
+      "js/util.js",
+      "js/mui.picker.all.js",
+      "js/template.js"
+    ],
+    "refer": [
+      "customerDetail.html",
+      "index.html"
+    ]
+  },
+  "report.html": {
+    "resources": [
+      "js/mui.min.js",
+      "fonts/mui.ttf",
+      "css/iconfont.css",
+      "css/mui.picker.all.css",
+      "css/mui.min.css",
+      "fonts/iconfont.ttf",
+      "js/util.js",
+      "js/mui.picker.all.js"
+    ]
+  },
+  "houseDetail.html": {
+    "resources": [
+      "fonts/iconfont.ttf",
+      "js/mui.min.js",
+      "fonts/mui.ttf",
+      "css/mui.picker.all.css",
+      "js/util.js",
+      "css/iconfont.css",
+      "css/mui.min.css",
+      "js/template.js"
+    ]
+  },
+  "customerDetail.html": {
+    "resources": [
+      "js/mui.min.js",
+      "fonts/mui.ttf",
+      "css/mui.picker.all.css",
+      "fonts/iconfont.ttf",
+      "js/util.js",
+      "css/iconfont.css",
+      "css/mui.min.css",
+      "js/template.js"
+    ]
+  },
+  "scan.html": {
+    "resources": [
+      "js/mui.min.js",
+      "fonts/mui.ttf",
+      "js/util.js",
+      "css/mui.min.css",
+      "js/plupload.full.min.js"
+    ],
+    "refer": [
+      "camera.html"
+    ]
+  },
+  "camera.html": {
+    "resources": [
+      "js/util.js",
+      "js/mui.min.js",
+      "css/mui.min.css"
+    ]
+  }
+}

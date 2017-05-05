@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+		<style type="text/css">
+			.title{background-color: #0FC5E9;color: #fff;}
+			.title h1{color: #fff;}
+			.title a{color: #fff;}
+			.mui-bar-tab .mui-tab-item{color: #000;background-color: #fff;}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav title">
+			<a id='menu' class="mui-pull-left mui-icon mui-icon-bars"></a>
+			<a id='scan' class="mui-pull-right mui-icon iconfont icon-icon_scan"></a>
+			<h1 id="title" class="mui-center mui-title">通话列表</h1>
+		</header>
+		<nav class="mui-bar mui-bar-tab">
+			<a id="tab" class="mui-tab-item mui-active" href="call.html">
+				<span class="mui-icon iconfont icon-dianhua"></span>
+				<span class="mui-tab-label">通话列表</span>
+			</a>
+			<a class="mui-tab-item" href="house.html">
+				<span class="mui-icon iconfont icon-mp-nav-home-c"></span>
+				<span class="mui-tab-label">房源</span>
+			</a>
+			<a class="mui-tab-item" href="customer.html">
+				<span class="mui-icon iconfont icon-user2"></span>
+				<span class="mui-tab-label">客源</span>
+			</a>
+			<a class="mui-tab-item" href="report.html">
+				<span class="mui-icon iconfont icon-baobiaoxitong"></span>
+				<span class="mui-tab-label">查看报表</span>
+			</a>
+		</nav>
+
+		<script src="js/mui.min.js"></script>
+		<script src="js/util.js"></script>
+		<script type="text/javascript">
+			//mui初始化
+			mui.init({
+				swipeBack: false
+			});
+			var subpages = ['call.html', 'house.html', 'customer.html', 'report.html'];
+			var subpage_style = [{
+				top: '45px',
+				bottom: '51px'
+			}, {
+				top: '45px',
+				bottom: '51px'
+			}, {
+				top: '45px',
+				bottom: '51px'
+			}, {
+				top: '45px',
+				bottom: '51px'
+			}];
+			var aniShow = {};
+			//创建子页面，首个选项卡页面显示，其它均隐藏；
+			mui.plusReady(function() {
+				
+				//退出app
+				var qa = new util.quiteApp();
+				mui.back = function() {
+					qa.exit();
+				};
+				var self = plus.webview.currentWebview();
+				for (var i = 0; i < 4; i++) {
+					var temp = {};
+					var sub = plus.webview.create(subpages[i], subpages[i], subpage_style[i]);
+					if (i > 0) {
+						sub.hide();
+					} else {
+						temp[subpages[i]] = "true";
+						mui.extend(aniShow, temp);
+					}
+					self.append(sub);
+				}
+			});
+			//当前激活选项
+			var activeTab = subpages[0];
+			var title = document.getElementById("title");
+			//选项卡点击事件
+			mui('.mui-bar-tab').on('tap', 'a', function(e) {
+				var targetTab = this.getAttribute('href');
+				if (targetTab == activeTab) {
+					return;
+				}
+				//更换标题
+				title.innerHTML = this.querySelector('.mui-tab-label').innerHTML;
+				//显示目标选项卡
+				//若为iOS平台或非首次显示，则直接显示
+				if (mui.os.ios || aniShow[targetTab]) {
+					plus.webview.show(targetTab);
+				} else {
+					//否则，使用fade-in动画，且保存变量
+					var temp = {};
+					temp[targetTab] = "true";
+					mui.extend(aniShow, temp);
+					plus.webview.show(targetTab, "slide-in-right", 300);
+				}
+				//隐藏当前;
+				plus.webview.hide(activeTab);
+				//更改当前活跃的选项卡
+				activeTab = targetTab;
+			});
+			//自定义事件，模拟点击“首页选项卡”
+			document.addEventListener('gohome', function() {
+				var defaultTab = document.getElementById("tab");
+				//模拟首页点击
+				mui.trigger(defaultTab, 'tap');
+				//切换选项卡高亮
+				var current = document.querySelector(".mui-bar-tab>.mui-tab-item.mui-active");
+				if (defaultTab !== current) {
+					current.classList.remove('mui-active');
+					defaultTab.classList.add('mui-active');
+				}
+			});
+			
+			//扫码
+			document.getElementById('scan').addEventListener('tap',function(){
+				mui.openWindow({
+					url:'scan.html',
+					id:'scan',
+					show:{
+							aniShow: 'slide-in-right',
+							duration: 300
+						}
+				});
+			});
+			
+			//个人中心
+			document.getElementById('menu').addEventListener('tap',function(){
+				alert('当前版本1.0');
+			});
+		</script>
+	</body>
+
+</html>

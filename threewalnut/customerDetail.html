@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/mui.picker.all.css" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+		<style>
+			.scan {
+				font-size: 12px;
+				padding-top: 12px;
+			}
+			
+			.title {
+				background-color: #0FC5E9;
+				color: #fff;
+			}
+			
+			.title h1 {
+				color: #fff;
+			}
+			
+			.title a {
+				color: #fff;
+			}
+			
+			.detail {
+				margin-bottom: 20px;
+			}
+			
+			.detail p {
+				color: #000;
+			}
+			
+			.detail p i {
+				margin-right: 10px;
+			}
+			
+			.detail p span {
+				width: 25%;
+				display: inline-block;
+			}
+			
+			.detail p img {
+				height: 160px;
+				display: block;
+				background-color: #0FC5E9;
+			}
+			
+			.tags {
+				width: 100%;
+			}
+			
+			.tags ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				padding-left: 15px;
+				float: left;
+				margin-bottom: 10px;
+			}
+			
+			.tags ul li {
+				float: left;
+				padding: 2px;
+				font-size: 14px;
+				margin-right: 8px;
+				width: 30%;
+			}
+			
+			.tags ul li i {
+				color: #0FC5E9;
+				margin-right: 5px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav title">
+			<!--<a id='scan' href="javascript:;" class="mui-pull-right scan"><i class="iconfont icon-icon_scan"></i> 扫一扫</a>-->
+			<a id='back' class="mui-pull-left mui-icon mui-icon-arrowleft"></a>
+			<h1 class="mui-center mui-title">客源</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded detail" id="customerDetail"></div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/template.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/html" id="customer">
+			<p><i class="mui-icon iconfont icon-tag"></i><span>客源编号：</span>{{customer.customer_no}}</p>
+			<p><i class="mui-icon iconfont icon-18"></i><span>客户：</span>{{customer.name}}</p>
+			<p><i class="mui-icon iconfont icon-contact"></i><span>客户类型：</span>{{customer.type}}</p>
+			<p><i class="mui-icon iconfont icon-file1"></i><span>交易类型：</span>{{customer.listing_type}}</p>
+			<p><i class="mui-icon iconfont icon-zu"></i><span>是否包租：</span>{{customer.rent_type}}</p>
+			<p><i class="mui-icon iconfont icon-fenxi"></i><span>所属部门：</span>{{customer.dept_name}}</p>
+			<p><i class="mui-icon iconfont icon-gongqiazhaozhongpai"></i><span>员工：</span>{{customer.employee_name}}</p>
+			<p><i class="mui-icon iconfont icon-fangxing"></i><span>房型：</span>2-2-1-1</p>
+			<p><i class="mui-icon iconfont icon-cunqianguan"></i><span>价格：</span>{{customer.price_min}} - {{customer.price_max}}</p>
+			<p><i class="mui-icon iconfont icon-zhilupai"></i><span>城区：</span>{{customer.district}}</p>
+			<p><i class="mui-icon iconfont icon-location"></i><span>现住址：</span>{{customer.address}}</p>
+			<p><i class="mui-icon iconfont icon-icon12"></i><span>用途：</span>{{customer.usage}}</p>
+			<p><i class="mui-icon iconfont icon-icotag"></i><span>状态：</span>{{customer.status}}</p>
+			<p><i class="mui-icon iconfont icon-link"></i><span>来源：</span>{{customer.source}}</p>
+			<p><i class="mui-icon iconfont icon-start"></i><span>优质客：</span>是</p>
+			<p><i class="mui-icon iconfont icon-date1"></i><span>委托日期：</span>{{customer.entrusted_date}}</p>
+			<p><i class="mui-icon iconfont icon-random"></i><span>支付类型：</span>{{customer.pay_type}}</p>
+			<p><i class="mui-icon iconfont icon-time"></i><span>最后跟进：</span></p>
+			<p><i class="mui-icon iconfont icon-time"></i><span>最后带看：</span></p>
+			<p><i class="mui-icon iconfont icon-pin"></i><span>备注：</span>{{customer.comment}}</p>
+		</script>
+		<script>
+			mui.plusReady(function() {
+				
+				var data = mui.currentWebview.customerDetail;
+				document.getElementById('customerDetail').innerHTML = template('customer',{customer:data.result[0]});
+				
+				document.getElementById('back').addEventListener('tap', function() {
+				//获取当前窗口，返回的时候注销，否则数据不更新
+				var webid = plus.webview.getWebviewById('customerDetail');
+				plus.webview.close(webid);
+					mui.openWindow({
+						url: 'main.html',
+						id: 'main',
+						show: {
+							aniShow: 'zoom-fade-out',
+							duration: 300
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+
+</html>

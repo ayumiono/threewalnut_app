@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/mui.picker.all.css" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+		<style type="text/css">
+			.dataSelect {
+				width: 100%;
+				height: 120px;
+			}
+			
+			.dataSelect-r {
+				width: 100%;
+				height: 60px;
+			}
+			
+			.detail {
+				margin-bottom: 20px;
+				padding-top: 10px;
+			}
+			
+			.detail p {
+				color: #000;
+			}
+			
+			.detail p i {
+				margin-right: 10px;
+			}
+			
+			.detail p span {
+				width: 45%;
+				display: inline-block;
+			}
+			
+			.detail p img {
+				height: 160px;
+				display: block;
+				background-color: #0FC5E9;
+			}
+			
+			.time {
+				padding: 10px 0;
+				line-height: 35px;
+				font-size: 14px;
+			}
+			
+			.time button {
+				display: inline-block;
+				padding: 5px;
+			}
+			
+			.time .btn-datetime {
+				background-color: #efeff4;
+				width: 25%;
+				height: 30px;
+			}
+			
+			.time .btn-submit {
+				background-color: #0FC5E9;
+				color: #fff;
+				border: 1px solid #0FC5E9;
+				width: 25%;
+				margin-left: 2%;
+			}
+			
+			.time span {
+				padding-right: 5px;
+				padding-left: 5px;
+			}
+			
+			.area {
+				padding: 10px 0;
+				line-height: 35px;
+				font-size: 14px;
+			}
+			
+			.area button {
+				background-color: #efeff4;
+			}
+			
+			hr {
+				border: 1px dashed #ddd;
+				margin: 5px 0;
+			}
+			
+			.report li {
+				list-style: none;
+				padding-bottom: 20px;
+				border-bottom: 1px dashed #0FC5E9;
+			}
+			
+			.report li:last-child {
+				border-bottom: none;
+			}
+			
+			.report li h4 {
+				font-size: 14px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div id="segmentedControl" class="mui-segmented-control">
+					<a class="mui-control-item mui-active" href="#item1">任务报表</a>
+					<a class="mui-control-item" href="#item2">业主报表</a>
+					<a class="mui-control-item" href="#item3">客户报表</a>
+				</div>
+				<div id="item1" class="mui-control-content mui-active detail">
+					<div class="dataSelect-r">
+						<div class="area">
+							<label>部门：</label>
+							<button id="area-rw" class="mui-btn"><span id="areaName-rw">选择部门</span><i class="mui-icon mui-icon-arrowdown"></i></button>
+						</div>
+					</div>
+					<ul class="mui-table-view-cell report" id="taskReportList"></ul>
+				</div>
+				<div id="item2" class="mui-control-content detail">
+					<div class="dataSelect">
+						<div class="time">
+							<label>时间：</label>
+							<button id="start" class="btn-datetime" data-options='{"type":"date","beginYear":2010,"endYear":2096}'></button><span>至</span>
+							<button id="end" class="btn-datetime" data-options='{"type":"date","beginYear":2010,"endYear":2096}'></button>
+							<button class="btn-submit" id="exec-house">查询</button>
+						</div>
+						<div class="area">
+							<label>部门：</label>
+							<button id="area-house" class="mui-btn"><span id="areaName-hs">选择部门</span><i class="mui-icon mui-icon-arrowdown"></i></button>
+						</div>
+					</div>
+					<ul class="mui-table-view-cell report" id="houseOwnerList"></ul>
+				</div>
+				<div id="item3" class="mui-control-content detail">
+					<div class="dataSelect">
+						<div class="time">
+							<label>时间：</label>
+							<button id="start-customer" class="btn-datetime" data-options='{"type":"date","beginYear":2010,"endYear":2096}'></button><span>至</span>
+							<button id="end-customer" class="btn-datetime" data-options='{"type":"date","beginYear":2010,"endYear":2096}'></button>
+							<button class="btn-submit" id="exec-customer">查询</button>
+						</div>
+						<div class="area">
+							<label>部门：</label>
+							<button id="area-customer" class="mui-btn"><span id="areaName-ct">选择部门</span><i class="mui-icon mui-icon-arrowdown"></i></button>
+						</div>
+					</div>
+					<ul class="mui-table-view-cell report" id="customerList"></ul>
+				</div>
+			</div>
+		</div>
+		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/mui.picker.all.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/util.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/template.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/zepto.core.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/html" id="taskReportData">
+			{{each taskReportData as value index}}
+			<li>
+				<h4>{{value.name}}：</h4>
+				<div>
+					<p><i class="mui-icon iconfont icon-user2"></i>业主总数：{{value.total_count}}</p>
+					<p><i class="mui-icon iconfont icon-contact"></i>未接受服务：{{value.not_accept_count}}</p>
+					<p><i class="mui-icon iconfont icon-yaochifang"></i>未接受微信：{{value.no_weixin_count}}</p>
+				</div>
+			</li>
+			{{/each}}
+		</script>
+		<script type="text/html" id="houseOwnerData">
+			{{each houseOwnerData as value index}}
+			<li>
+				<h4>{{value.name}}：</h4>
+				<div>
+					<p><i class="mui-icon iconfont icon-user2"></i>业主总数：{{value.total_count}}</p>
+					<p><i class="mui-icon iconfont icon-contact"></i>接受服务：{{value.accept_count}}</p>
+					<p><i class="mui-icon iconfont icon-adduser"></i>微信：{{value.weixin_count}}</p>
+					<p><i class="mui-icon iconfont icon-yaochifang"></i>带看：{{value.follow_count}}</p>
+					<p><i class="mui-icon iconfont icon-phone"></i>有效电话：{{value.effective_call_count}}</p>
+					<p><i class="mui-icon iconfont icon-zu"></i>出售：{{value.on_sale_count}}</p>
+					<p><i class="mui-icon iconfont icon-sale"></i>出租：{{value.on_rent_count}}</p>
+				</div>
+			</li>
+			{{/each}}
+		</script>
+		<script type="text/html" id="customerData">
+			{{each customerData as value index}}
+			<li>
+				<h4>{{value.name}}：</h4>
+				<div>
+					<p><i class="mui-icon iconfont icon-user2"></i>一手房客户数：{{value.buy_new_total_count}}</p>
+					<p><i class="mui-icon iconfont icon-contact"></i>二手房客户数：{{value.buy_used_total_count}}</p>
+					<p><i class="mui-icon iconfont icon-adduser"></i>新增一手房客户数：{{value.buy_new_add_count}}</p>
+					<p><i class="mui-icon iconfont icon-yaochifang"></i>新增二手房客户数：{{value.buy_used_add_count}}</p>
+					<p><i class="mui-icon iconfont icon-phone"></i>私客数：{{value.buy_private_count}}</p>
+					<p><i class="mui-icon iconfont icon-zu"></i>带看数：{{value.buy_watch_count}}</p>
+					<p><i class="mui-icon iconfont icon-sale"></i>租客数：{{value.rent_private_count}}</p>
+					<p><i class="mui-icon iconfont icon-sale"></i>租客带看数：{{value.rent_watch_count}}</p>
+				</div>
+			</li>
+			{{/each}}
+		</script>
+		<script type="text/javascript">
+			mui.plusReady(function() {
+				var startTime = null,
+					start_customer = null,
+					endTime = null,
+					end_customer = null,
+					type = 0,
+					tmpDeptList = null,
+					tmpTaskList = null;
+				//业主报表开始时间
+				document.getElementById('start').addEventListener('tap', function() {
+					var options = {type:"date",beginYear:2010,endYear:new Date().getFullYear()};
+					var picker = new mui.DtPicker(options);
+					picker.show(function(rs) {
+						document.getElementById('start').innerText = rs.text;
+						startTime = rs.text;
+						picker.dispose();
+					});
+				});
+				//客户报表开始时间
+				document.getElementById('start-customer').addEventListener('tap', function() {
+					var options = {type:"date",beginYear:2010,endYear:new Date().getFullYear()};
+					var picker = new mui.DtPicker(options);
+					picker.show(function(rs) {
+						document.getElementById('start-customer').innerText = rs.text;
+						start_customer = rs.text;
+						picker.dispose();
+					});
+				});
+				//业主报表结束时间
+				document.getElementById('end').addEventListener('tap', function() {
+					var options = {type:"date",beginYear:2010,endYear:new Date().getFullYear()};
+					var picker = new mui.DtPicker(options);
+					picker.show(function(rs) {
+						document.getElementById('end').innerText = rs.text;
+						endTime = rs.text;
+						picker.dispose();
+					});
+				});
+				//业务报表结束时间
+				document.getElementById('end-customer').addEventListener('tap', function() {
+					var options = {type:"date",beginYear:2010,endYear:new Date().getFullYear()};
+					var picker = new mui.DtPicker(options);
+					picker.show(function(rs) {
+						document.getElementById('end-customer').innerText = rs.text;
+						end_customer = rs.text;
+						picker.dispose();
+					});
+				});
+				//获取任务报表部门
+				document.getElementById('area-rw').addEventListener('tap', function() {
+					if (tmpTaskList) {
+						var pick = new mui.PopPicker();
+						pick.setData(tmpTaskList);
+						pick.show(function(item) {
+							document.getElementById('areaName-rw').innerText = item[0].text;
+							getTaskReport(item[0].uid);
+						});
+					} else {
+						util.ajax({
+							url: '/merchant/report/deptlist',
+							data: {},
+							success: function(data) {
+								if (data.result.length) {
+									var pick = new mui.PopPicker();
+									tmpTaskList = data.result;
+									pick.setData(data.result);
+									pick.show(function(item) {
+										document.getElementById('areaName-rw').innerText = item[0].text;
+										getTaskReport(item[0].uid);
+									});
+								} else {
+									mui.toast('获取部门列表失败');
+								}
+							}
+						});
+					}
+				});
+				//获取业主报表部门
+				document.getElementById('exec-house').addEventListener('tap', function() {
+					houseAndCustomerFormat();
+				});
+				//获取客户报表部门
+				document.getElementById('exec-customer').addEventListener('tap', function() {
+					houseAndCustomerFormat();
+				});
+				//获取业主报表
+				document.getElementById('area-house').addEventListener('tap', function() {
+					deptListFoamat();
+				});
+				//获取客户报表
+				document.getElementById('area-customer').addEventListener('tap', function() {
+					deptListFoamat();
+				});
+				mui('#segmentedControl').on('tap', 'a', function() {
+					type = $(this).index();
+				});
+				//获取任务报表
+				function getTaskReport(dept_uid) {
+					$('#taskReportList').children().remove();
+					if (dept_uid) {
+						util.ajax({
+							url: '/merchant/report/business',
+							data: {
+								dept_uid: dept_uid
+							},
+							success: function(data) {
+								$('#taskReportList').append(template('taskReportData', {
+									taskReportData: data.result
+								}));
+							}
+						});
+					}
+				}
+				//获取业主报表
+				function getHouseOwnerReport(dept_uid) {
+					$('#houseOwnerList').children().remove();
+					if (new Date(startTime) > new Date(endTime)) {
+						mui.toast('开始时间不能大于结束时间');
+					} else {
+						util.ajax({
+							url: '/merchant/report/house',
+							data: {
+								dept_uid: dept_uid,
+								start: startTime,
+								end: endTime
+							},
+							success: function(data) {
+								$('#houseOwnerList').append(template('houseOwnerData', {
+									houseOwnerData: data.result
+								}));
+							}
+						});
+					}
+				}
+				//获取客户列表
+				function getCustomerReport(dept_uid) {
+					$('#customerList').children().remove();
+					if (new Date(start_customer) > new Date(end_customer)) {
+						mui.toast('开始时间不能大于结束时间');
+					} else {
+						util.ajax({
+							url: '/merchant/report/customer',
+							data: {
+								dept_uid: dept_uid,
+								start: start_customer,
+								end: end_customer
+							},
+							success: function(data) {
+								$('#customerList').append(template('customerData', {
+									customerData: data.result
+								}));
+							}
+						});
+					}
+				}
+				//处理业务报表和客户报表时间和条件
+				function houseAndCustomerFormat() {
+					var params = {};
+					if (type == 1) {
+						//业主报表
+						if (startTime && endTime) {
+							if (new Date(startTime) > new Date(endTime)) {
+								mui.toast('开始时间不能大于结束时间');
+							} else {
+								params.start = startTime;
+								params.end = endTime;
+								getDeptList(params);
+							}
+						} else {
+							mui.toast('请先选择起止时间段');
+						}
+					}
+					if (type == 2) {
+						//客户报表
+						if (start_customer && end_customer) {
+							if (new Date(start_customer) > new Date(end_customer)) {
+								mui.toast('开始时间不能大于结束时间');
+							} else {
+								params.start = start_customer;
+								params.end = end_customer;
+								getDeptList(params);
+							}
+						} else {
+							mui.toast('请先选择起止时间段');
+						}
+					}
+				}
+				//获取业主报表和客户报表的部门数据
+				function getDeptList(params) {
+					if (params) {
+						util.ajax({
+							url: '/merchant/report/deptlist',
+							data: params,
+							success: function(data) {
+								mui.toast('查询部门列表成功,请选择部门查看详情');
+								tmpDeptList = data.result;
+							}
+						});
+					}
+				}
+				//处理业主和客户部门列表选择
+				function deptListFoamat() {
+					if (tmpDeptList) {
+						var pick = new mui.PopPicker();
+						pick.setData(tmpDeptList);
+						pick.show(function(item) {
+							if (type == 1) {
+								if (startTime && endTime) {
+									document.getElementById('areaName-hs').innerText = item[0].text;
+									getHouseOwnerReport(item[0].uid);
+								} else {
+									mui.toast('起止时间不能为空');
+								}
+							}
+							if (type == 2) {
+								if (start_customer && end_customer) {
+									document.getElementById('areaName-ct').innerText = item[0].text;
+									getCustomerReport(item[0].uid);
+								} else {
+									mui.toast('起止时间不能为空');
+								}
+							}
+						});
+					} else {
+						mui.toast('没有部门列表，请重新查询');
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>
